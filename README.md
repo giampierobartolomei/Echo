@@ -14,98 +14,58 @@ Echo detects and classifies manipulative play gestures using embedded machine‑
 
 ## Hardware Setup
 - **Microcontroller:** ESP32 (with integrated MPU6050 IMU)  
-- **Sensors:** 3‑axis accelerometer (±2 g) and gyroscope (±500 °/s), tilt angles 0–360°  
-- **Storage:** microSD for local data logging  
+- **Sensors:** MPU9265 sensor: 3‑axis accelerometer (±2 g) and gyroscope (±500 °/s), tilt angles 0–360°  
 - **Outputs:** LEDs and speaker for multimodal feedback  
-- **Prototype files:** `.fzz` breadboard, schematic, and PCB layouts are included in the repo.  
-- **Audio:** `play_sounds/` folder includes example `.mp3` files for feedback behavior.
+- **Prototype files:** `.fzz` breadboard, schematic, and PCB layouts are included in the electronics/ folder.  
+- **Audio:** `mp3/` folder includes `.mp3` files for feedback behavior, please copy this folder in a microSD and put into the DFplayermini module.
 
 ---
 
 ## Firmware and Algorithms
 
 ### Folders and Functions
-- **GetAngle** – Arduino code for raw data acquisition and tilt computation.  
-- **getangle_classification** – firmware for **real‑time gesture classification** and control of LEDs/sounds.  
-- **first_classify** – experimental early version for serial‑only inference (without majority voting).  
-- **fft_computation** and **dt_model** – signal processing and decision‑tree model training, integrated into `getangle_classification`.
+The firmware/ directory contains the Arduino sketch for Echo. This sketch integrates the motion‑classification model (already compiled into model.h) and controls the LEDs and DFPlayerMini. Simply open the .ino file in the Arduino IDE, install the required libraries, and upload it to your ESP32. No additional training is needed – the decision‑tree model is embedded and ready to run.
 
 ### Signal and Range
 - Accelerometer: ±2 g (gravity compensation active)  
 - Gyroscope: ±500 °/s  
 - Tilt angles: 0–360°
 
-### Model Training
-The **Decision Tree (DT)** classifier is trained on ten labeled recordings per subject.  
-Training and testing can be reproduced via Google Colab notebooks provided in:
-```
-python/spectrumclassification/
-```
-Originally the models were exported manually, later automatically translated to C (`model.h`) using **microMLgen**.
 
----
+## Android App (APK)
 
-## Android App – `MPU_TOY_V0`
+The app/ folder includes a prebuilt Android application (EchoApp.apk). Install this APK directly on an Android device (Android 8+ recommended). 
 
-The `MPU_TOY_V0` folder contains a **Godot** project that serves as the companion **Android app** for Echo.
-
-### Building and Exporting
-1. Open the project in **Godot**.  
-2. Select *Android Export* and verify the Android build template.  
-3. If prompted to rebuild `android/build`, copy the original `AndroidManifest.xml` to the new directory.  
-   This ensures the app can save log files containing sensor readings and labels.
-
-For installation issues, refer to the **IM‑TWIN‑App** repository.
-
-### App Features
+### Features
 - Real‑time plotting of **tilt** and **accelerometer** data.  
 - **Label selection buttons** for organizing recorded gestures.  
 - Automatic creation of labeled log files.  
-- Volume and LED sliders (v1.0.1 update): LEDs turn on at startup, and users can control brightness and sound volume.  
+- Volume and LED sliders: LEDs turn on at startup, and users can control brightness and sound volume.  
 - Bluetooth connection with Echo for real‑time classification feedback.
 
----
+## 3D‑Printable Cover
 
-## Python and Colab Tools
+The cover_3d/ directory provides STL files for a 3D‑printable cover/enclosure. Print the parts at 100 % scale using PLA or PETG, then assemble them around the ESP32 and DFPlayerMini according to the photographs in the folder. The cover is designed to protect the electronics and provide a child‑friendly form factor.
 
-Offline analysis and model generation are handled via Python and Colab scripts in:
-```
-python/spectrumclassification/
-```
-These scripts cover:
-- Spectral feature extraction (FFT‑based).  
-- Decision‑tree training and export.  
-- Automated conversion to embedded C headers using **microMLgen**.  
-- Example notebooks for model validation and data visualization.
+## Embedding
 
----
+Use an e-form fabric, fill it with wadding and place the electronics in the base of the 'e'; make the led strip run over all the prototype.
 
 ## Data Workflow
 
-1. Run **Echo** with `getangle_classification` firmware.  
-2. Connect the Android **MPU_TOY_V0 App**.  
-3. Select gesture label and record data (logged to SD and app).  
-4. Export `.csv` files for training using the Colab scripts.  
-5. Generate a new `model.h` and flash it to the device for updated recognition.  
+1. Assemble the hardware following the electronics diagram and install the firmware from firmware/.
 
----
+2. Copy the contents of the mp3/ folder onto a microSD card and insert it into the DFPlayerMini.
 
-## Repository Layout
-```
-Echo/
-├─ GetAngle/                     # raw acquisition firmware
-├─ getangle_classification/      # final classification firmware
-├─ first_classify/               # experimental test firmware
-├─ MPU_TOY_V0/                   # Godot Android app project
-├─ python/spectrumclassification # Colab + Python tools
-├─ fft_computation/              # preprocessing scripts
-├─ dt_model/                     # DT training artifacts
-├─ play_sounds/                  # audio feedback
-├─ data_analysis/                # test data and model generation
-└─ README.md
-```
+3. Install the EchoApp.apk on an Android device and pair it via Bluetooth with your ESP32.
 
----
+4. Power on Echo. When gestures are performed, the device will classify them using the embedded model and provide audio/LED feedback.
+
+5. Use the app to view live sensor data, adjust settings and log sessions for later analysis.
+
+6. Export logged .csv files from the app if you wish to retrain or refine the model.
+
+
 
 ## Citations
 
