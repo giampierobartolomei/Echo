@@ -49,7 +49,7 @@ The cover_3d/ directory provides STL files for a 3D‑printable cover/enclosure.
 
 ## Embedding
 
-Use an e-form fabric, fill it with wadding and place the electronics in the base of the 'e'; make the led strip run over all the prototype.
+Use an e-form fabric, fill it with wadding and place the electronics in the flat base; make the led strip run over all the prototype.
 
 ## Data Workflow
 
